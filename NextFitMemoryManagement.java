@@ -1,84 +1,174 @@
-import java.util.Scanner;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class NextFitMemoryManagement {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        // Input number of blocks and processes
-        System.out.print("Enter the number of blocks: ");
-        int blockCount = sc.nextInt();
-        System.out.print("Enter the number of processes: ");
-        int processCount = sc.nextInt();
-
-        // Input block sizes
-        int[] blockSizes = new int[blockCount];
-        System.out.println("\nEnter the size of the blocks:-");
-        for (int i = 0; i < blockCount; i++) {
-            System.out.print("Block " + (i + 1) + ": ");
-            blockSizes[i] = sc.nextInt();
-        }
-
-        // Input process sizes
-        int[] processSizes = new int[processCount];
-        System.out.println("\nEnter the size of the Processes:-");
-        for (int i = 0; i < processCount; i++) {
-            System.out.print("Process " + (i + 1) + ": ");
-            processSizes[i] = sc.nextInt();
-        }
-
-        // Allocate memory using Next Fit
-        int[] allocation = new int[processCount];
-        int lastAllocatedIndex = 0; // Start from the beginning of the block list
-
-        for (int i = 0; i < processCount; i++) {
-            allocation[i] = -1; // Initialize to indicate no allocation
-            int count = 0; // To ensure we do not loop infinitely
-            while (count < blockCount) {
-                int currentIndex = (lastAllocatedIndex + count) % blockCount;
-                if (blockSizes[currentIndex] >= processSizes[i]) {
-                    allocation[i] = currentIndex; // Allocate block
-                    blockSizes[currentIndex] -= processSizes[i];
-                    lastAllocatedIndex = currentIndex; // Update last allocated block
-                    break;
-                }
-                count++;
-            }
-        }
-
-        // Calculate Internal and External Fragmentation
-        int internalFragmentation = 0;
-        for (int i = 0; i < blockCount; i++) {
-            if (blockSizes[i] > 0) {
-                internalFragmentation += blockSizes[i];
-            }
-        }
-
-        int externalFragmentation = 0;
-        for (int i = 0; i < blockCount; i++) {
-            if (blockSizes[i] > 0 && !isBlockUsable(blockSizes[i], processSizes)) {
-                externalFragmentation += blockSizes[i];
-            }
-        }
-
-        // Display results
-        System.out.println("\nProcess_No\tProcess_Size\tBlock_No\tBlock_Size\tFragment");
-        for (int i = 0; i < processCount; i++) {
-            if (allocation[i] != -1) {
-                int blockNo = allocation[i] + 1;
-                System.out.println((i + 1) + "\t\t" + processSizes[i] + "\t\t" + blockNo
-                        + "\t\t" + (blockSizes[allocation[i]] + processSizes[i]) + "\t\t" + blockSizes[allocation[i]]);
-            } else {
-                System.out.println((i + 1) + "\t\t" + processSizes[i] + "\t\tNot Allocated");
-            }
-        }
-
-        System.out.println("\nInternal Fragmentation = " + internalFragmentation);
-        System.out.println("External Fragmentation = " + externalFragmentation);
-
-        sc.close();
+        SwingUtilities.invokeLater(NextFitMemoryManagement::createAndShowGUI);
     }
 
-    // Helper function to check if a block is usable for any process
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("Next Fit Memory Management");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+
+        // Input panel for blocks and processes
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Input"));
+
+        JLabel blockCountLabel = new JLabel("Number of Blocks:");
+        JTextField blockCountField = new JTextField();
+        inputPanel.add(blockCountLabel);
+        inputPanel.add(blockCountField);
+
+        JLabel processCountLabel = new JLabel("Number of Processes:");
+        JTextField processCountField = new JTextField();
+        inputPanel.add(processCountLabel);
+        inputPanel.add(processCountField);
+
+        JLabel blockSizesLabel = new JLabel("Block Sizes (comma-separated):");
+        JTextField blockSizesField = new JTextField();
+        inputPanel.add(blockSizesLabel);
+        inputPanel.add(blockSizesField);
+
+        JLabel processSizesLabel = new JLabel("Process Sizes (comma-separated):");
+        JTextField processSizesField = new JTextField();
+        inputPanel.add(processSizesLabel);
+        inputPanel.add(processSizesField);
+
+        JButton calculateButton = new JButton("Calculate");
+        JButton clearButton = new JButton("Clear All");
+        inputPanel.add(calculateButton);
+        inputPanel.add(clearButton);
+
+        // Result table
+        DefaultTableModel tableModel = new DefaultTableModel();
+        JTable resultTable = new JTable(tableModel);
+        tableModel.addColumn("Process No");
+        tableModel.addColumn("Process Size");
+        tableModel.addColumn("Block No");
+        tableModel.addColumn("Block Size");
+        tableModel.addColumn("Fragment");
+        JScrollPane tableScrollPane = new JScrollPane(resultTable);
+
+        JLabel internalFragLabel = new JLabel("Internal Fragmentation: 0");
+        JLabel externalFragLabel = new JLabel("External Fragmentation: 0");
+
+        calculateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int blockCount = Integer.parseInt(blockCountField.getText().trim());
+                    int processCount = Integer.parseInt(processCountField.getText().trim());
+
+                    int[] blockSizes = parseInput(blockSizesField.getText().trim(), blockCount);
+                    int[] processSizes = parseInput(processSizesField.getText().trim(), processCount);
+
+                    // Perform Next Fit allocation
+                    int[] allocation = new int[processCount];
+                    int lastAllocatedIndex = 0;
+
+                    for (int i = 0; i < processCount; i++) {
+                        allocation[i] = -1;
+                        int count = 0;
+                        while (count < blockCount) {
+                            int currentIndex = (lastAllocatedIndex + count) % blockCount;
+                            if (blockSizes[currentIndex] >= processSizes[i]) {
+                                allocation[i] = currentIndex;
+                                blockSizes[currentIndex] -= processSizes[i];
+                                lastAllocatedIndex = currentIndex;
+                                break;
+                            }
+                            count++;
+                        }
+                    }
+
+                    // Calculate internal and external fragmentation
+                    int internalFragmentation = 0;
+                    for (int size : blockSizes) {
+                        if (size > 0) {
+                            internalFragmentation += size;
+                        }
+                    }
+
+                    int externalFragmentation = 0;
+                    for (int size : blockSizes) {
+                        if (size > 0 && !isBlockUsable(size, processSizes)) {
+                            externalFragmentation += size;
+                        }
+                    }
+
+                    // Update results table
+                    tableModel.setRowCount(0);
+                    for (int i = 0; i < processCount; i++) {
+                        if (allocation[i] != -1) {
+                            int blockNo = allocation[i] + 1;
+                            tableModel.addRow(new Object[]{
+                                    i + 1,
+                                    processSizes[i],
+                                    blockNo,
+                                    blockSizes[allocation[i]] + processSizes[i],
+                                    blockSizes[allocation[i]]
+                            });
+                        } else {
+                            tableModel.addRow(new Object[]{
+                                    i + 1,
+                                    processSizes[i],
+                                    "Not Allocated",
+                                    "-",
+                                    "-"
+                            });
+                        }
+                    }
+
+                    internalFragLabel.setText("Internal Fragmentation: " + internalFragmentation);
+                    externalFragLabel.setText("External Fragmentation: " + externalFragmentation);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid input. Please check your values.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                blockCountField.setText("");
+                processCountField.setText("");
+                blockSizesField.setText("");
+                processSizesField.setText("");
+                tableModel.setRowCount(0);
+                internalFragLabel.setText("Internal Fragmentation: 0");
+                externalFragLabel.setText("External Fragmentation: 0");
+            }
+        });
+
+        frame.setLayout(new BorderLayout(10, 10));
+        frame.add(inputPanel, BorderLayout.NORTH);
+        frame.add(tableScrollPane, BorderLayout.CENTER);
+
+        JPanel fragmentationPanel = new JPanel(new GridLayout(0, 1));
+        fragmentationPanel.add(internalFragLabel);
+        fragmentationPanel.add(externalFragLabel);
+        frame.add(fragmentationPanel, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+    }
+
+    private static int[] parseInput(String input, int count) throws Exception {
+        String[] parts = input.split(",");
+        if (parts.length != count) {
+            throw new Exception("Invalid input size.");
+        }
+        int[] result = new int[count];
+        for (int i = 0; i < count; i++) {
+            result[i] = Integer.parseInt(parts[i].trim());
+        }
+        return result;
+    }
+
     private static boolean isBlockUsable(int blockSize, int[] processSizes) {
         for (int size : processSizes) {
             if (blockSize >= size) {
