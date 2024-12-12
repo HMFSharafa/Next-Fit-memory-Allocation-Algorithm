@@ -1,1 +1,1 @@
-/Next-Fit-memory-Allocation-Algorithm/
+Next-Fit-memory-Allocation-Algorithm
