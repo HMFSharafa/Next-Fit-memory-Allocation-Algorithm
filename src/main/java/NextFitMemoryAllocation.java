@@ -12,7 +12,7 @@ public class NextFitMemoryAllocation {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Next Fit Memory Management");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(900, 700);
 
         // Input panel for blocks and processes
         JPanel inputPanel = new JPanel(new GridLayout(0, 2, 10, 10));
@@ -52,10 +52,24 @@ public class NextFitMemoryAllocation {
         tableModel.addColumn("Block Size");
         tableModel.addColumn("Fragment");
         JScrollPane tableScrollPane = new JScrollPane(resultTable);
+        tableScrollPane.setBorder(BorderFactory.createTitledBorder("Process Allocation Table"));
 
+        // Block summary panel
+        DefaultTableModel blockSummaryModel = new DefaultTableModel();
+        JTable blockSummaryTable = new JTable(blockSummaryModel);
+        blockSummaryModel.addColumn("Block No");
+        blockSummaryModel.addColumn("Initial Size");
+        blockSummaryModel.addColumn("Remaining Size");
+        blockSummaryModel.addColumn("Status");
+        JScrollPane blockSummaryScrollPane = new JScrollPane(blockSummaryTable);
+
+        blockSummaryScrollPane.setBorder(BorderFactory.createTitledBorder("Block Summary"));
+
+        // Fragmentation labels
         JLabel internalFragLabel = new JLabel("Internal Fragmentation: 0");
         JLabel externalFragLabel = new JLabel("External Fragmentation: 0");
 
+        // Event listeners
         calculateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -64,6 +78,7 @@ public class NextFitMemoryAllocation {
                     int processCount = Integer.parseInt(processCountField.getText().trim());
 
                     int[] blockSizes = parseInput(blockSizesField.getText().trim(), blockCount);
+                    int[] initialBlockSizes = blockSizes.clone();
                     int[] processSizes = parseInput(processSizesField.getText().trim(), processCount);
 
                     // Perform Next Fit allocation
@@ -87,16 +102,14 @@ public class NextFitMemoryAllocation {
 
                     // Calculate internal and external fragmentation
                     int internalFragmentation = 0;
-                    for (int size : blockSizes) {
-                        if (size > 0) {
-                            internalFragmentation += size;
-                        }
-                    }
-
                     int externalFragmentation = 0;
-                    for (int size : blockSizes) {
-                        if (size > 0 && !isBlockUsable(size, processSizes)) {
-                            externalFragmentation += size;
+
+                    for (int i = 0; i < blockCount; i++) {
+                        if (blockSizes[i] > 0) {
+                            internalFragmentation += blockSizes[i];
+                            if (!isBlockUsable(blockSizes[i], processSizes)) {
+                                externalFragmentation += blockSizes[i];
+                            }
                         }
                     }
 
@@ -123,6 +136,17 @@ public class NextFitMemoryAllocation {
                         }
                     }
 
+                    // Update block summary table
+                    blockSummaryModel.setRowCount(0);
+                    for (int i = 0; i < blockCount; i++) {
+                        blockSummaryModel.addRow(new Object[]{
+                                i + 1,
+                                initialBlockSizes[i],
+                                blockSizes[i],
+                                blockSizes[i] < initialBlockSizes[i] ? "Allocated" : "Free"
+                        });
+                    }
+
                     internalFragLabel.setText("Internal Fragmentation: " + internalFragmentation);
                     externalFragLabel.setText("External Fragmentation: " + externalFragmentation);
 
@@ -140,14 +164,17 @@ public class NextFitMemoryAllocation {
                 blockSizesField.setText("");
                 processSizesField.setText("");
                 tableModel.setRowCount(0);
+                blockSummaryModel.setRowCount(0);
                 internalFragLabel.setText("Internal Fragmentation: 0");
                 externalFragLabel.setText("External Fragmentation: 0");
             }
         });
 
+        // Layout management
         frame.setLayout(new BorderLayout(10, 10));
         frame.add(inputPanel, BorderLayout.NORTH);
         frame.add(tableScrollPane, BorderLayout.CENTER);
+        frame.add(blockSummaryScrollPane, BorderLayout.EAST);
 
         JPanel fragmentationPanel = new JPanel(new GridLayout(0, 1));
         fragmentationPanel.add(internalFragLabel);
