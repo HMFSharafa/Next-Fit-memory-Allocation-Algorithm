@@ -82,14 +82,6 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
 - Visualization of memory allocation in real-time.
 - Enhanced error handling and validation.
 
-## Contributing
-
-Contributions are welcome! Please fork the repository and create a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Contact
 
 For questions or suggestions, feel free to contact the project maintainer.
