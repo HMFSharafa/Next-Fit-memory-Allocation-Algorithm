@@ -104,15 +104,28 @@ public class NextFitMemoryAllocation {
                     int internalFragmentation = 0;
                     int externalFragmentation = 0;
 
+                    boolean anyProcessUnallocated = false;
+
+                    // Check for unallocated processes
+                    for (int i = 0; i < processCount; i++) {
+                        if (allocation[i] == -1) {
+                            anyProcessUnallocated = true;
+                            break;
+                        }
+                    }
+                    // Internal fragmentation: Sum remaining space in allocated blocks
                     for (int i = 0; i < blockCount; i++) {
-                        if (blockSizes[i] > 0) {
+                        if (blockSizes[i] > 0 && blockSizes[i] < initialBlockSizes[i]) {
                             internalFragmentation += blockSizes[i];
-                            if (!isBlockUsable(blockSizes[i], processSizes)) {
-                                externalFragmentation += blockSizes[i];
-                            }
                         }
                     }
 
+                    // External fragmentation: Sum free block sizes
+                    for (int i = 0; i < blockCount; i++) {
+                        if (blockSizes[i] > 0) {
+                            externalFragmentation += blockSizes[i];
+                        }
+                    }
                     // Update results table
                     tableModel.setRowCount(0);
                     for (int i = 0; i < processCount; i++) {
