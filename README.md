@@ -2,6 +2,9 @@
 
 This project demonstrates a simple simulation of the **Next Fit Memory Allocation** algorithm using a graphical user interface (GUI) implemented in Java. The program allows users to allocate processes to memory blocks based on the Next Fit strategy and provides insights into internal and external fragmentation.
 
+## System Design 
+![image](https://github.com/user-attachments/assets/90e96dfb-38c6-4d0f-9060-fd552a82ab97)
+
 ## Features
 
 - **Graphical User Interface (GUI):** User-friendly interface created using Java Swing.
