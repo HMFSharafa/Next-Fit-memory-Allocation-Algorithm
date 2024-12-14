@@ -71,7 +71,7 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
   | 3          | 80           | 3        | 150        | 70       |
   | 4          | 150           | Not Allocated | -      | -        |
 
-  - Block Summary Table
+ - Block Summary Table
 
 | Block No   | Initial Size | Remaining Size | Status       | 
 |------------|--------------|----------------|--------------|
