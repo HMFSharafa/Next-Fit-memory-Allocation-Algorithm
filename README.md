@@ -55,9 +55,9 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
 
 **Input:**
 - Number of Blocks: `3`
-- Block Sizes: `100, 200, 300`
 - Number of Processes: `4`
-- Process Sizes: `120, 150, 80`
+- Block Sizes: `100, 200, 300`
+- Process Sizes: `120, 150, 80, 150`
 
 **Output:**
 - Process Allocation Table:
@@ -65,17 +65,18 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
   |------------|--------------|----------|------------|----------|
   | 1          | 120          | 2        | 200        | 80       |
   | 2          | 150          | 3        | 300        | 150      |
-  | 3          | 80           | 1        | 100        | 20       |
-  | 4          | 60           | Not Allocated | -      | -        |
+  | 3          | 80           | 3        | 150        | 20       |
+  | 4          | 150           | Not Allocated | -      | -        |
 
-- Internal Fragmentation: `250`
-- External Fragmentation: `0`
+- Internal Fragmentation: `100`
+- External Fragmentation: `100`
 
 ## Technologies Used
 
 - **Java** for programming
 - **Swing** for GUI development
-
+- **Git** for Virsion Control
+- 
 ## Future Enhancements
 
 - Support for dynamic memory allocation.
