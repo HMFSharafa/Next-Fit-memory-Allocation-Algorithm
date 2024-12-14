@@ -79,7 +79,7 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
 | 2          | 200          | 80             | Allocated    |
 | 3          | 300          | 70             | Allocated    |
 
-- Internal Fragmentation: `130`
+- Internal Fragmentation: `150`
 - External Fragmentation: `100`
 
 ## Technologies Used
