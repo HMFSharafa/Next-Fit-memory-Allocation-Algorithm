@@ -65,10 +65,19 @@ This project demonstrates a simple simulation of the **Next Fit Memory Allocatio
   |------------|--------------|----------|------------|----------|
   | 1          | 120          | 2        | 200        | 80       |
   | 2          | 150          | 3        | 300        | 150      |
-  | 3          | 80           | 3        | 150        | 20       |
+  | 3          | 80           | 3        | 150        | 70       |
   | 4          | 150           | Not Allocated | -      | -        |
 
-- Internal Fragmentation: `100`
+  - Block Summary Table:
+  | Block No | Initial Size | Remining Size| Status | 
+  |------------|--------------|----------|------------|
+  | 1          | 100          | 100         | Free        |
+  | 2          | 200          | 80       | Allocated        |
+  | 3          | 300           | 70        | Allocated        |
+
+
+
+- Internal Fragmentation: `130`
 - External Fragmentation: `100`
 
 ## Technologies Used
